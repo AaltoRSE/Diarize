@@ -25,7 +25,7 @@ setup(
             'transcribe_and_diarize=transcribe_and_diarize:transcribe_and_diarize_audio',
         ],
     },
-    python_requires=">3.9,<3.12",
+    python_requires="<3.12",
     install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
