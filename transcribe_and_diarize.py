@@ -8,12 +8,15 @@ from pyannote_whisper.utils import diarize_text
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-@click.command()
+@click.command(context_settings={'show_default': True})
 @click.option('--min_speakers', default=2, help='Mininum number of speakers')
 @click.option('--max_speakers', default=5, help='Maximum number of speakers')
 @click.option('--input_file', default=None, help='Input file name')
 @click.option('--input_folder', default=None, help='Input file name')
 @click.option('--output_folder', default=None, help='Output file name')
+@click.option('--model', help='Whisper model', default="base",
+    type=click.Choice(whisper.available_models(), case_sensitive=False)
+)
 def transcribe_and_diarize_audio(min_speakers, max_speakers, input_file, input_folder, output_folder):
 
     if input_file is None and input_folder is None:
@@ -53,9 +56,9 @@ def transcribe_and_diarize_audio(min_speakers, max_speakers, input_file, input_f
         )
         final_result = diarize_text(asr_result, diarization_result)
 
-        with open(outfile, "a") as out_fp:
+        with open(outfile, "w") as out_fp:
             for seg, spk, sent in final_result:
-                line = f'{seg.start:.2f} {seg.end:.2f} {spk} {sent}'
+                line = f'{seg.start:.2f} {seg.end:.2f} {spk} {sent}\n'
                 print(line)
                 out_fp.write(line)
         
