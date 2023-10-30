@@ -131,8 +131,8 @@ def transcribe_and_diarize_audio(
         final_result = align(asr_result, diarization_result)
 
         with open(outfile, "w") as out_fp:
-            for seg, spk, sent in final_result:
-                line = f'{seg.start:.2f} {seg.end:.2f} {spk} {sent}\n'
+            for start, end, speaker, text in zip(final_result["start"], final_result["end"], final_result["speaker"], final_result["transcription"]):
+                line = f'{seg["start"]:.2f} {seg["end"]:.2f} {speaker} {text}\n'
                 print(line)
                 out_fp.write(line)
         
