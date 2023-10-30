@@ -1,2 +1,4 @@
-pyannote-whisper@git+https://github.com/yinruiqing/pyannote-whisper.git
 click
+pyannote.audio
+torch
+whisper
