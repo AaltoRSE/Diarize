@@ -4,9 +4,73 @@ import glob
 import torch
 import whisper
 from pyannote.audio import Pipeline
-from pyannote_whisper.utils import diarize_text
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def align(transcription, diarization):
+    """
+    Align diarization with transcription.
+
+    Transcription and diarization segments is measured using overlap in time.
+
+    If no diarization segment overlaps with a given transcription segment, the speaker
+    for that transcription segment is None.
+
+    The output object is a dict of lists:
+
+    {
+    "start" : [0.0, 4.5, 7.0],
+    "end"   : [3.3, 6.0, 10.0],
+    "transcription" : ["This is first first speaker segment", "This is the second", "This is from an unknown speaker"],
+    "speaker": ["SPEAKER_00", "SPEAKER_01", None]
+    }
+
+    Parameters
+    ----------
+    transcription : list
+        Output of Whisper transcribe()
+    diarization : list
+        Output of Pyannote diarization()
+
+    Returns
+    -------
+    dict
+    """
+    transcription_segments = [
+        (segment["start"], segment["end"], segment["text"])
+        for segment in transcription["segments"]
+    ]
+    diarization_segments = [
+        (segment.start, segment.end, speaker)
+        for segment, _, speaker in diarization.itertracks(yield_label=True)
+    ]
+    alignment = defaultdict(list)
+    for transcription_start, transcription_end, text in transcription_segments:
+        max_overlap, max_speaker = None, None
+        for diarization_start, diarization_end, speaker in diarization_segments:
+            overlap = compute_overlap(
+                transcription_start,
+                transcription_end,
+                diarization_start,
+                diarization_end,
+            )
+            if overlap == 0:
+                continue
+            if max_overlap is None or overlap > max_overlap:
+                max_overlap, max_speaker = overlap, speaker
+
+        transcription_start = seconds_to_human_readable(transcription_start)
+        transcription_end = seconds_to_human_readable(transcription_end)
+
+        alignment["start"].append(transcription_start)
+        alignment["end"].append(transcription_end)
+        alignment["speaker"].append(max_speaker)
+        alignment["transcription"].append(text.strip())
+
+    return alignment
+
+
 
 @click.command(context_settings={'show_default': True})
 @click.option('--min_speakers', default=2, help='Mininum number of speakers')
@@ -64,7 +128,7 @@ def transcribe_and_diarize_audio(
         diarization_result = pipeline(
             infile, min_speakers=min_speakers, max_speakers=max_speakers
         )
-        final_result = diarize_text(asr_result, diarization_result)
+        final_result = align(asr_result, diarization_result)
 
         with open(outfile, "w") as out_fp:
             for seg, spk, sent in final_result:
