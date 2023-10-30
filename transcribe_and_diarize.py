@@ -113,7 +113,7 @@ def transcribe_and_diarize_audio(
             continue
 
         print("Loading models")
-        if hugging_face_token is None:
+        if hugging_face_token is not None:
             pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization",
                                                 use_auth_token=hugging_face_token)
         else:
