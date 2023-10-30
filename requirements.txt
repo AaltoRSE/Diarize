@@ -1,4 +1,4 @@
 click
 pyannote.audio
 torch
-whisper
+openai-whisper
