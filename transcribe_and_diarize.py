@@ -152,16 +152,16 @@ def transcribe_and_diarize_audio(
         else:
             pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1")
         if device == "cuda":
-            pipeline.to(torch.device(0))
+            pipeline.to(torch.device("cuda:0"))
 
         model = whisper.load_model(model, device=device)
 
-        print(f"Transcribing {infile}")
-        asr_result = model.transcribe(infile)
         print(f"Diarizing {infile}")
         diarization_result = pipeline(
             infile, min_speakers=min_speakers, max_speakers=max_speakers
         )
+        print(f"Transcribing {infile}")
+        asr_result = model.transcribe(infile)
         final_result = align(asr_result, diarization_result)
 
         with open(outfile, "w") as out_fp:
