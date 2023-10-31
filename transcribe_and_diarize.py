@@ -2,10 +2,43 @@ import os
 import click
 import glob
 import torch
+import numpy as np
 import whisper
+import collections
 from pyannote.audio import Pipeline
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def seconds_to_human_readable(seconds):
+    """
+    Convert seconds to human readable string.
+
+    Example:
+
+    seconds_to_human_readable(3661) = "01:01:01"
+    """
+    SECONDS_IN_HOUR = 3600
+    SECONDS_IN_MINUTE = 60
+    hours = int(np.floor(seconds / SECONDS_IN_HOUR))
+    minutes = int(np.floor((seconds - hours * SECONDS_IN_HOUR) / SECONDS_IN_MINUTE))
+    seconds = int(
+        round(seconds - hours * SECONDS_IN_HOUR - minutes * SECONDS_IN_MINUTE)
+    )
+
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+def compute_overlap(start1, end1, start2, end2):
+    if start1 > end1 or start2 > end2:
+        raise ValueError("Start of segment can't be larger than its end.")
+
+    start_overlap = max(start1, start2)
+    end_overlap = min(end1, end2)
+
+    if start_overlap > end_overlap:
+        return 0
+
+    return abs(end_overlap - start_overlap)
 
 
 def align(transcription, diarization):
@@ -45,7 +78,7 @@ def align(transcription, diarization):
         (segment.start, segment.end, speaker)
         for segment, _, speaker in diarization.itertracks(yield_label=True)
     ]
-    alignment = defaultdict(list)
+    alignment = collections.defaultdict(list)
     for transcription_start, transcription_end, text in transcription_segments:
         max_overlap, max_speaker = None, None
         for diarization_start, diarization_end, speaker in diarization_segments:
@@ -132,7 +165,7 @@ def transcribe_and_diarize_audio(
 
         with open(outfile, "w") as out_fp:
             for start, end, speaker, text in zip(final_result["start"], final_result["end"], final_result["speaker"], final_result["transcription"]):
-                line = f'{seg["start"]:.2f} {seg["end"]:.2f} {speaker} {text}\n'
+                line = f'{start} {end}: {speaker} {text}\n'
                 print(line)
                 out_fp.write(line)
         
