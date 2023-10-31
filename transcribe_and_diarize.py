@@ -166,7 +166,7 @@ def transcribe_and_diarize_audio(
         final_result = align(asr_result, diarization_result)
 
         with open(outfile, "w") as out_fp:
-            for start, end, speaker, text in zip(final_result["start"], final_result["speaker"], final_result["transcription"]):
+            for start, speaker, text in zip(final_result["start"], final_result["speaker"], final_result["transcription"]):
                 if timestamps:
                     line = f'{start}: {speaker} {text}\n'
                 else:
