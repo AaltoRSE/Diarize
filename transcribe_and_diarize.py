@@ -115,10 +115,11 @@ def align(transcription, diarization):
     type=click.Choice(whisper.available_models(), case_sensitive=False)
 )
 @click.option('--skip_existing', default=True, help='Skip audio file if output file exists')
+@click.option('--timestamps', default=False, help='Include timestamps on each line')
 @click.option('--hugging_face_token', default=None, help='Hugging face access token (required on first run)')
 def transcribe_and_diarize_audio(
     min_speakers, max_speakers, input_file, input_folder, output_folder,
-    model, skip_existing, hugging_face_token
+    model, skip_existing, timestamps, hugging_face_token
 ):
 
     if input_file is None and input_folder is None:
@@ -165,8 +166,11 @@ def transcribe_and_diarize_audio(
         final_result = align(asr_result, diarization_result)
 
         with open(outfile, "w") as out_fp:
-            for start, end, speaker, text in zip(final_result["start"], final_result["end"], final_result["speaker"], final_result["transcription"]):
-                line = f'{start} {end}: {speaker} {text}\n'
+            for start, end, speaker, text in zip(final_result["start"], final_result["speaker"], final_result["transcription"]):
+                if timestamps:
+                    line = f'{start}: {speaker} {text}\n'
+                else:
+                    line = f'{speaker}: {text}\n'
                 print(line)
                 out_fp.write(line)
         
