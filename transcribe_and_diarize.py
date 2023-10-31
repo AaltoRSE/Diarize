@@ -146,11 +146,13 @@ def transcribe_and_diarize_audio(
             continue
 
         print("Loading models")
+        diarization_model = "pyannote/speaker-diarization@2.1"
+        print(f".. {diarization_model}")
         if hugging_face_token is not None:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1",
+            pipeline = Pipeline.from_pretrained(diarization_model,
                                                 use_auth_token=hugging_face_token)
         else:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1")
+            pipeline = Pipeline.from_pretrained(diarization_model)
         if device == "cuda":
             pipeline.to(torch.device("cuda:0"))
 
