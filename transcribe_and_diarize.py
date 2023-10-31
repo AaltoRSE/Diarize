@@ -147,11 +147,12 @@ def transcribe_and_diarize_audio(
 
         print("Loading models")
         if hugging_face_token is not None:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization",
+            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1",
                                                 use_auth_token=hugging_face_token)
         else:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
-        pipeline.to(torch.device(device))
+            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1")
+        if device == "cuda":
+            pipeline.to(torch.device(0))
 
         model = whisper.load_model(model, device=device)
 
