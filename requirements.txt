@@ -2,3 +2,5 @@ click
 pyannote.audio
 torch
 openai-whisper
+gpt4all
+langchain
