@@ -18,7 +18,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 @click.option('--output_folder', default=None, help='Output file name')
 @click.option('--model', required=True, help='Summarization model file name')
 @click.option('--skip_existing', default=True, help='Skip audio file if output file exists')
-def summarize(input_file, input_folder, output_folder, model, skip_existing):
+@click.option('--use_cuda', default=False, help='Use cuda to run the model')
+def summarize(input_file, input_folder, output_folder, model, skip_existing, use_cuda):
     #from gpt4all import GPT4All
     
     if input_file is None and input_folder is None:
@@ -39,6 +40,10 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing):
 
     for infile in input_files:
         outfile = infile.replace('_diarized.txt', '_summary.txt')
+
+        if skip_existing and os.path.exists(outfile):
+            continue
+
         with open(infile) as f:
             text = f.read()
 
@@ -47,8 +52,11 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing):
         docs = [Document(page_content=t) for t in texts]
 
         callbacks = [StreamingStdOutCallbackHandler()]
-        llm = GPT4All(model=model, callbacks=callbacks, verbose=True, device=device)
-        chain = load_summarize_chain(llm, chain_type="map_reduce", verbose=True)
+        llm = GPT4All(model=model, callbacks=callbacks, verbose=True)
+        if use_cuda:
+            chain = load_summarize_chain(llm, chain_type="map_reduce", verbose=True, device=device)
+        else:
+            chain = load_summarize_chain(llm, chain_type="map_reduce", verbose=True)
 
         output_summary = chain.run(docs)
 
