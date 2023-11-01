@@ -1,6 +1,7 @@
 import click
 import glob
 import os
+import torch
 
 from langchain.llms import GPT4All
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
@@ -8,6 +9,8 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 @click.command(context_settings={'show_default': True})
 @click.option('--input_file', default=None, help='Input file name')
@@ -44,7 +47,7 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing):
         docs = [Document(page_content=t) for t in texts]
 
         callbacks = [StreamingStdOutCallbackHandler()]
-        llm = GPT4All(model=model, callbacks=callbacks, verbose=True)
+        llm = GPT4All(model=model, callbacks=callbacks, verbose=True, device=device)
         chain = load_summarize_chain(llm, chain_type="map_reduce", verbose=True)
 
         output_summary = chain.run(docs)
