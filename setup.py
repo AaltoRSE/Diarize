@@ -19,6 +19,7 @@ setup(
     packages=find_packages(where='.'),
     py_modules=[
         "transcribe_and_diarize",
+        "summarize_transcript"
     ],
     entry_points={
        'console_scripts': [
