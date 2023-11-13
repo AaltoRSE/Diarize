@@ -6,8 +6,30 @@ import numpy as np
 import whisper
 import collections
 from pyannote.audio import Pipeline
+from pathlib import Path
+from pydub import AudioSegment
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def convert_to_wav(input_file, tmp_dir="tmp/"):
+    Path(tmp_dir).mkdir(parents=True, exist_ok=True)
+
+    if str(input_file).lower().endswith(".wav"):
+        print(f".. .. File is already in wav format: {input_file}")
+        return input_file
+
+    if not Path(input_file).is_file():
+        raise ValueError(f".. .. File does not exist: {input_file}")
+
+    converted_file = Path(tmp_dir) / Path(Path(input_file).name).with_suffix(".wav")
+    if Path(converted_file).is_file():
+        print(f".. .. Converted file {converted_file} already exists.")
+        return converted_file
+
+    AudioSegment.from_file(input_file).export(converted_file, format="wav")
+    print(f".. .. File converted to wav: {converted_file}")
+    return converted_file
 
 
 def seconds_to_human_readable(seconds):
@@ -165,6 +187,8 @@ def transcribe_and_diarize_audio(
         )
         final_result = align(asr_result, diarization_result)
 
+        wav_file = convert_to_wav(infile)
+        
         with open(outfile, "w") as out_fp:
             for start, speaker, text in zip(final_result["start"], final_result["speaker"], final_result["transcription"]):
                 if timestamps:
