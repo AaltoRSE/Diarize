@@ -4,3 +4,4 @@ torch
 openai-whisper
 gpt4all
 langchain
+pydub
