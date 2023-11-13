@@ -155,6 +155,14 @@ def transcribe_and_diarize_audio(
     if input_folder is not None:
         input_files = glob.glob(os.path.join(input_folder, '*.wav'))
         input_files.extend(glob.glob(os.path.join(input_folder, '*.WAV')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.mp3')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.MP3')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.mp4')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.MP4')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.m4a')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.M4A')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.flac')))
+        input_files.extend(glob.glob(os.path.join(input_folder, '*.FLAC')))
         if output_folder is None:
             output_folder = input_folder
     
