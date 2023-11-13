@@ -188,14 +188,14 @@ def transcribe_and_diarize_audio(
             continue
 
         print(f"Transcribing {infile}")
+        infile = convert_to_wav(infile)
+        
         asr_result = model.transcribe(infile)
         print(f"Diarizing {infile}")
         diarization_result = pipeline(
             infile, min_speakers=min_speakers, max_speakers=max_speakers
         )
         final_result = align(asr_result, diarization_result)
-
-        wav_file = convert_to_wav(infile)
         
         with open(outfile, "w") as out_fp:
             for start, speaker, text in zip(final_result["start"], final_result["speaker"], final_result["transcription"]):
