@@ -161,23 +161,23 @@ def transcribe_and_diarize_audio(
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
+    print("Loading models")
+    if hugging_face_token is not None:
+        pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1",
+                                                use_auth_token=hugging_face_token)
+    else:
+        pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1")
+    if device == "cuda":
+        pipeline.to(torch.device(0))
+    
+    model = whisper.load_model(model, device=device)
+
     for infile in input_files:
         outfile = "".join(os.path.basename(infile).split(".")[:-1]) + "_diarized.txt"
         outfile = os.path.join(output_folder, outfile)
 
         if skip_existing and os.path.exists(outfile):
             continue
-
-        print("Loading models")
-        if hugging_face_token is not None:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1",
-                                                use_auth_token=hugging_face_token)
-        else:
-            pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization@2.1")
-        if device == "cuda":
-            pipeline.to(torch.device(0))
-
-        model = whisper.load_model(model, device=device)
 
         print(f"Transcribing {infile}")
         asr_result = model.transcribe(infile)
