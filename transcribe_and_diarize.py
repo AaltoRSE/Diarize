@@ -22,7 +22,7 @@ def convert_to_wav(input_file, tmp_dir="tmp/"):
     if not Path(input_file).is_file():
         raise ValueError(f".. .. File does not exist: {input_file}")
 
-    converted_file = Path(tmp_dir) / Path(Path(input_file).name).with_suffix(".wav")
+    converted_file = str(Path(tmp_dir) / Path(Path(input_file).name).with_suffix(".wav"))
     if Path(converted_file).is_file():
         print(f".. .. Converted file {converted_file} already exists.")
         return converted_file
