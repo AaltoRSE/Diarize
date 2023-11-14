@@ -29,7 +29,7 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing, use
         input_files = [input_file]
         if output_folder is None:
             output_folder = "./"
-nput_file is not None:
+    if input_file is not None:
         input_files = [input_file]
         if output_folder is None:
             output_folde
