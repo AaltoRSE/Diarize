@@ -29,7 +29,10 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing, use
         input_files = [input_file]
         if output_folder is None:
             output_folder = "./"
-
+nput_file is not None:
+        input_files = [input_file]
+        if output_folder is None:
+            output_folde
     if input_folder is not None:
         input_files = glob.glob(os.path.join(input_folder, '*.txt'))
         if output_folder is None:
@@ -39,12 +42,16 @@ def summarize(input_file, input_folder, output_folder, model, skip_existing, use
         os.makedirs(output_folder)
 
     for infile in input_files:
+        outfile = "".join(os.path.basename(infile).split(".")[:-1]) + "_diarized.txt"
+        outfile = os.path.join(output_folder, outfile)
         if "_summary.txt" in infile:
             continue
         if "_diarized.txt" in infile:
-            outfile = infile.replace('_diarized.txt', '_summary.txt')
+            outfile = os.path.basename(infile).replace('_diarized.txt', '_summary.txt')
+            outfile = os.path.join(output_folder, outfile)
         else:
-            outfile = infile.replace('.txt', '_summary.txt')
+            outfile = "".join(os.path.basename(infile).split(".")[:-1]) + "_summary.txt"
+            outfile = os.path.join(output_folder, outfile)
 
         if skip_existing and os.path.exists(outfile):
             continue
