@@ -10,7 +10,7 @@ with open(requirementstxt, "r") as file:
 
 setup(
     name='transcribe_and_diarize',
-    version="0.3.7",
+    version="1.0.0",
     description='A script for trancribing and diarizing wav formatted audio files.',
     long_description_content_type='text/markdown',
     author='Jarno Rantaharju',
