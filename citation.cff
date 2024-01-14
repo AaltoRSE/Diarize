@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Please cite this software as below."
+authors:
+- family-names: "Rantaharju"
+  given-names: "Jarno"
+  orcid: "https://orcid.org/0000-0002-0072-7707"
+- family-names: "Teemu"
+  given-names: "Ruokolainen"
+title: "Diarize"
+version: 1.0.0
+doi: 10.5281/zenodo.10201091
+date-released: 2024-01-14
+url: "https://github.com/AaltoRSE/Diarize"
