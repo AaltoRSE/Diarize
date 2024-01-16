@@ -6,6 +6,9 @@ authors:
   orcid: "https://orcid.org/0000-0002-0072-7707"
 - family-names: "Teemu"
   given-names: "Ruokolainen"
+- family-names: "Truong"
+  given-names: "Nghiep Lucy"
+  orcid: "https://orcid.org/0009-0009-9668-4403"
 title: "Diarize"
 version: 1.0.0
 doi: 10.5281/zenodo.10201091
